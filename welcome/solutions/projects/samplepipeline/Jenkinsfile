@@ -42,7 +42,9 @@ pipeline {
 
         stage('Run Flask Application') {
             steps {
-                dir("${PROJECT_HOME}") {
+                parallel {
+                    a: {
+                        dir("${PROJECT_HOME}") {
                     script {
                         // Run Flask app within the virtual environment
                         sh '''#!/bin/bash
@@ -61,7 +63,16 @@ pipeline {
                         '''
                     }
                 }
-            }
+
+                }
+
+                    b: {
+                        echo "Hello" && sleep 5
+                    }
+
+
+                }
+                            
         }
 
         stage('Verify Application') {
