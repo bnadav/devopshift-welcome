@@ -42,7 +42,7 @@ pipeline {
 
         stage('Run Flask Application') {
             steps {
-                parallel {
+                parallel (
                     a: {
                         dir("${PROJECT_HOME}") {
                     script {
@@ -71,7 +71,7 @@ pipeline {
                     }
 
 
-                }
+                )
                             
         }
 
