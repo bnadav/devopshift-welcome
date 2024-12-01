@@ -26,26 +26,46 @@ pipeline {
                             echo "Installing virtualenv..."
                             pip install virtualenv
                         fi
-
-                        # Delete previously built virtualenv and create a new one
-                        rm -rf $PYENV_HOME
-                        virtualenv $PYENV_HOME
-                        source $PYENV_HOME/bin/activate
-
-                        # Install required Python packages
-                        pip install -r requirements.txt
+                        
                         '''
                     }
                 }
             }
         }
 
-        stage('Run Flask Application') {
+        stage('Parallel Execution') {
             parallel {
-                stage  {
+                stage('Install dependencies') {
                     steps {
                         dir("${PROJECT_HOME}") {
-                        script {
+                            script {
+                                // Install virtualenv if not available
+                                sh '''#!/bin/bash
+                                # Delete previously built virtualenv and create a new one
+                                rm -rf $PYENV_HOME
+                                virtualenv $PYENV_HOME
+                                source $PYENV_HOME/bin/activate
+
+                                # Install required Python packages
+                                pip install -r requirements.txt
+                                '''
+                            }
+                        }
+                    }
+                }
+                stage('Hello World') {
+                    steps {
+                        echo "Hello World"
+                        sh 'sleep 10s'
+                    }
+                }
+            }
+        }
+
+        stage('Run Flask Application') {
+            steps {
+                dir("${PROJECT_HOME}") {
+                    script {
                         // Run Flask app within the virtual environment
                         sh '''#!/bin/bash
                         source $PYENV_HOME/bin/activate
@@ -61,17 +81,9 @@ pipeline {
                         echo "Starting Flask application on 0.0.0.0:5005..."
                         nohup flask run --host=0.0.0.0 --port=5005 > flask_app.log 2>&1 &
                         '''
-                      }
                     }
                 }
-
-                    stage {
-                        steps {
-                          echo "Hello" && sleep 5
-                        }
-                    }
-                }
-                            
+            }
         }
 
         stage('Verify Application') {
