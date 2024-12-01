@@ -40,12 +40,12 @@ pipeline {
             }
         }
 
-        stage('Run Flask Application') {
-            steps {
-                parallel (
-                    a: {
+        stages('Run Flask Application') {
+            parallel {
+                stage  {
+                    steps {
                         dir("${PROJECT_HOME}") {
-                    script {
+                        script {
                         // Run Flask app within the virtual environment
                         sh '''#!/bin/bash
                         source $PYENV_HOME/bin/activate
@@ -61,17 +61,16 @@ pipeline {
                         echo "Starting Flask application on 0.0.0.0:5005..."
                         nohup flask run --host=0.0.0.0 --port=5005 > flask_app.log 2>&1 &
                         '''
+                      }
                     }
                 }
 
-                },
-
-                    b: {
-                        echo "Hello" && sleep 5
+                    stage {
+                        steps {
+                          echo "Hello" && sleep 5
+                        }
                     }
-
-
-                )
+                }
                             
         }
 
