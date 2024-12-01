@@ -40,7 +40,7 @@ pipeline {
             }
         }
 
-        stages('Run Flask Application') {
+        stage('Run Flask Application') {
             parallel {
                 stage  {
                     steps {
